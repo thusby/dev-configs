@@ -12,17 +12,17 @@ Legg til i prosjektet sitt `pyproject.toml`:
 
 ```toml
 [tool.ruff]
-extend = "../dev-configs/python/pyproject-base.toml"
+extend = "../../dev-configs/python/pyproject-base.toml"
 
 [tool.mypy]
-extend = "../dev-configs/python/pyproject-base.toml"
+extend = "../../dev-configs/python/pyproject-base.toml"
 ```
 
 ### Alternativ 2: Import heile fila
 
 ```bash
 cd prosjektet-ditt/
-ln -s ../dev-configs/python/pyproject-base.toml pyproject.toml
+ln -s ../../dev-configs/python/pyproject-base.toml pyproject.toml
 ```
 
 **NB:** Dette fungerer berre om du ikkje har prosjekt-spesifikke `[project]` seksjoner.
@@ -30,7 +30,7 @@ ln -s ../dev-configs/python/pyproject-base.toml pyproject.toml
 ### Alternativ 3: Kopier og tilpass
 
 ```bash
-cp ../dev-configs/python/pyproject-base.toml pyproject.toml
+cp ../../dev-configs/python/pyproject-base.toml pyproject.toml
 # Rediger pyproject.toml for prosjekt-spesifikke innstillingar
 ```
 
@@ -42,7 +42,7 @@ cp ../dev-configs/python/pyproject-base.toml pyproject.toml
 
 ```bash
 cd zephyr-meta/
-../dev-configs/setup.sh c-embedded .
+../../dev-configs/setup.sh c-embedded .
 ```
 
 Dette linkar:
@@ -53,8 +53,8 @@ Dette linkar:
 
 ```bash
 cd zephyr-meta/
-ln -s ../dev-configs/c-embedded/.clang-format .clang-format
-ln -s ../dev-configs/c-embedded/.editorconfig .editorconfig
+ln -s ../../dev-configs/c-embedded/.clang-format .clang-format
+ln -s ../../dev-configs/c-embedded/.editorconfig .editorconfig
 ```
 
 ---
@@ -65,7 +65,7 @@ ln -s ../dev-configs/c-embedded/.editorconfig .editorconfig
 
 ```bash
 cd localfarm/platform/frontend/
-../../../dev-configs/setup.sh node .
+../../../../dev-configs/setup.sh node .
 ```
 
 Dette linkar:
@@ -81,14 +81,14 @@ Dette linkar:
 
 ```bash
 cd prosjektet-ditt/
-ln -s ../dev-configs/git/python.gitignore .gitignore
+ln -s ../../dev-configs/git/python.gitignore .gitignore
 ```
 
 ### Node.js-prosjekt
 
 ```bash
 cd prosjektet-ditt/
-ln -s ../dev-configs/git/node.gitignore .gitignore
+ln -s ../../dev-configs/git/node.gitignore .gitignore
 ```
 
 ---
@@ -126,7 +126,7 @@ Når du oppdaterer filer i `dev-configs`:
 # Sjekk om filer er symlinks
 ls -la prosjektet/.clang-format
 
-# Output skal vise: .clang-format -> ../dev-configs/c-embedded/.clang-format
+# Output skal vise: .clang-format -> ../../dev-configs/c-embedded/.clang-format
 ```
 
 ---
@@ -139,7 +139,7 @@ ls -la prosjektet/.clang-format
 
 ```toml
 [tool.ruff]
-extend = "../dev-configs/python/pyproject-base.toml"
+extend = "../../dev-configs/python/pyproject-base.toml"
 ```
 
 ### Problem: Symlink viser feil sti
@@ -147,7 +147,7 @@ extend = "../dev-configs/python/pyproject-base.toml"
 **Løysing:** Bruk absolutt sti:
 
 ```bash
-ln -s /home/thusby/Development/projects/dev-configs/c-embedded/.clang-format .clang-format
+ln -s /home/thusby/Development/dev-configs/c-embedded/.clang-format .clang-format
 ```
 
 ### Problem: clang-format fungerar ikkje

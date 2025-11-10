@@ -137,7 +137,7 @@ Visuell oversikt over Terje Husby sitt development ecosystem.
 
 3. Project-specific overrides:
    [tool.ruff]
-   extend = "../dev-configs/python/pyproject-base.toml"
+   extend = "../../dev-configs/python/pyproject-base.toml"
 
    # Override specific settings
    line-length = 100  # Override default 88
@@ -174,7 +174,7 @@ Visuell oversikt over Terje Husby sitt development ecosystem.
     │ chezmoi apply
     │
     ▼
-~/Developer/projects/     (Mac path)
+~/Development/projects/     (Mac path)
 ~/dotfiles/
 ~/.claude/
 
@@ -184,7 +184,7 @@ PLATTFORM-DETEKSJON:
 │ dotfiles/shell/env.sh                  │
 ├────────────────────────────────────────┤
 │ if [[ "$OSTYPE" == "darwin"* ]]; then  │
-│   PROJECTS_DIR="$HOME/Developer"       │
+│   PROJECTS_DIR="$HOME/Development"       │
 │ elif [[ "$OSTYPE" == "linux"* ]]; then │
 │   PROJECTS_DIR="$HOME/Development"     │
 │ fi                                     │
@@ -329,7 +329,7 @@ ln -s ~/dotfiles/secrets/.env.service .env
 
 **...endre linting-regler for alle Python-prosjekt:**
 ```bash
-cd ~/Development/projects/dev-configs/
+cd ~/Development/dev-configs/
 vim python/pyproject-base.toml
 git commit -m "ruff: enable rule XYZ"
 git push
@@ -341,7 +341,7 @@ git push
 cd ~/Development/projects/
 mkdir nytt-prosjekt
 cd nytt-prosjekt
-../dev-configs/setup.sh python .
+../../dev-configs/setup.sh python .
 cp .env.example .env.example
 ln -s ~/dotfiles/secrets/.env.nytt .env
 ```

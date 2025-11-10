@@ -48,8 +48,8 @@ dev-configs/
 
 ```bash
 # From your project root
-ln -s ../../dev-configs/python/pyproject-base.toml pyproject.toml
-ln -s ../../dev-configs/c-embedded/.clang-format .clang-format
+ln -s ../../../dev-configs/python/pyproject-base.toml pyproject.toml
+ln -s ../../../dev-configs/c-embedded/.clang-format .clang-format
 ```
 
 ### Option 2: Import in pyproject.toml
@@ -57,7 +57,7 @@ ln -s ../../dev-configs/c-embedded/.clang-format .clang-format
 ```toml
 # In your project's pyproject.toml
 [tool.ruff]
-extend = "../dev-configs/python/ruff.toml"
+extend = "../../dev-configs/python/ruff.toml"
 ```
 
 ### Option 3: Copy and Customize

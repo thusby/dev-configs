@@ -49,7 +49,7 @@ Oversikt over korleis alle konfigurasjonssystem heng saman i Terje Husby sitt ut
 - Personlege dotfiles (shell, git, etc.)
 - Development/projects/ struktur
 - Claude Code settings
-- Kryss-plattform synkronisering (Mac/Linux)
+- Kryss-plattform synkronisering
 
 **Kommandoar:**
 ```bash
@@ -110,7 +110,7 @@ cp .env.example .env
 ---
 
 ### 3. **dev-configs** - Delte Prosjekt-standardar
-**Lokasjon:** `~/Development/projects/dev-configs/`
+**Lokasjon:** `~/Development/dev-configs/`
 
 **Føremål:** Team/prosjekt-standardar for kode-kvalitet og formatting
 
@@ -133,10 +133,10 @@ dev-configs/
 ```bash
 # Import i pyproject.toml
 [tool.ruff]
-extend = "../dev-configs/python/pyproject-base.toml"
+extend = "../../dev-configs/python/pyproject-base.toml"
 
 # Eller symlink
-ln -s ../dev-configs/c-embedded/.clang-format .clang-format
+ln -s ../../dev-configs/c-embedded/.clang-format .clang-format
 ```
 
 **Prosjekt som bruker dette:**
@@ -178,7 +178,7 @@ ln -s ../dev-configs/c-embedded/.clang-format .clang-format
 
 2. **Setup dev-configs:**
    ```bash
-   ../dev-configs/setup.sh python .
+   ../../dev-configs/setup.sh python .
    ```
 
 3. **Lag .env.example (for andre):**
@@ -218,13 +218,12 @@ ln -s ../dev-configs/c-embedded/.clang-format .clang-format
    chezmoi apply
    ```
 
-2. **Platform-deteksjon i dotfiles:**
+2. **Konsistent path på alle plattformer:**
    ```bash
    # ~/dotfiles/shell/env.sh
-   case "$OSTYPE" in
-       darwin*) PROJECTS_DIR="$HOME/Developer" ;;
-       linux*)  PROJECTS_DIR="$HOME/Development" ;;
-   esac
+   # Consistent across all platforms
+   export PROJECTS_DIR="$HOME/Development"
+   ```
    ```
 
 3. **Prosjekt bruker $PROJECTS_DIR:**
@@ -342,7 +341,7 @@ contributor → .env.example (copy to .env)
 # 1. Sjekk at alt er på plass
 chezmoi managed
 ls -la ~/dotfiles/secrets/
-ls -la ~/Development/projects/dev-configs/
+ls -la ~/Development/dev-configs/
 
 # 2. Start nytt prosjekt
 cd ~/Development/projects/
@@ -350,7 +349,7 @@ mkdir nytt-prosjekt
 cd nytt-prosjekt
 
 # 3. Setup
-../dev-configs/setup.sh python .
+../../dev-configs/setup.sh python .
 ln -s ~/dotfiles/secrets/.env.nytt-prosjekt .env
 
 # 4. Add til chezmoi (optional)
@@ -372,7 +371,7 @@ cp .env.example .env
 vim .env  # Fyll inn credentials
 
 # 3. Les dev-configs (optional)
-cat ../dev-configs/USAGE.md
+cat ../../dev-configs/USAGE.md
 
 # 4. Start utvikling
 npm install
@@ -386,7 +385,7 @@ npm start
 ### Oppdatere dev-configs
 
 ```bash
-cd ~/Development/projects/dev-configs/
+cd ~/Development/dev-configs/
 vim python/pyproject-base.toml
 git commit -m "ruff: enable new rule XYZ"
 git push

@@ -1,0 +1,6 @@
+2. **Platform-deteksjon i dotfiles:**
+   ```bash
+   # ~/dotfiles/shell/env.sh
+   # Consistent across all platforms
+   export PROJECTS_DIR="$HOME/Development"
+   ```

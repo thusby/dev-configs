@@ -1,6 +1,6 @@
 # Mac Migration: Developer → Development
 
-Guide for å endre frå `~/Developer` til `~/Development` på Mac for konsistens.
+Guide for å endre frå `~/Development` til `~/Development` på Mac for konsistens.
 
 ---
 
@@ -24,7 +24,7 @@ cd ~
 tar -czf ~/Desktop/Developer-backup-$(date +%Y%m%d).tar.gz Developer/
 ```
 
-### 2. Sjekk kva som peikar til ~/Developer
+### 2. Sjekk kva som peikar til ~/Development
 
 ```bash
 # Søk etter hardkoda paths
@@ -52,7 +52,7 @@ mv Developer Development
 ```bash
 # dotfiles/shell/env.sh
 case "$OSTYPE" in
-    darwin*) PROJECTS_DIR="$HOME/Developer" ;;
+    darwin*) PROJECTS_DIR="$HOME/Development" ;;
     linux*)  PROJECTS_DIR="$HOME/Development" ;;
 esac
 ```
@@ -107,7 +107,7 @@ cd $PROJECTS_DIR/projects/mcp-readwise
 ls -la .env  # Skal vise symlink
 
 # Test dev-configs
-cd $PROJECTS_DIR/projects/dev-configs
+cd $PROJECTS_DIR/dev-configs
 ./setup.sh python ../mcp-common  # Test at relative paths fungerer
 ```
 
@@ -125,7 +125,7 @@ Fjern platform-spesifikk path-tabell og bruk konsistent path:
 All platforms use: `~/Development/projects/`
 
 Previously used platform-specific paths:
-- Mac: ~/Developer (deprecated)
+- Mac: ~/Development (deprecated)
 - Linux: ~/Development
 ```
 
@@ -166,7 +166,7 @@ ln -s ~/dotfiles/secrets/.env.readwise .env
 ```bash
 # Søk etter hardkoda paths
 cd ~/Development/projects/
-grep -r "$HOME/Developer" . --exclude-dir=.git --exclude-dir=node_modules
+grep -r "$HOME/Development" . --exclude-dir=.git --exclude-dir=node_modules
 
 # Erstatt med $PROJECTS_DIR eller ~/Development
 ```
@@ -229,7 +229,7 @@ echo $PROJECTS_DIR  # Should show: /home/thusby/Development
 ### Oppdater prosjekt-dokumentasjon
 
 ```bash
-cd ~/Development/projects/dev-configs/
+cd ~/Development/dev-configs/
 vim ECOSYSTEM.md
 # Fjern Mac-spesifikke paths
 
@@ -247,15 +247,15 @@ git push
 
 set -e
 
-echo "🔄 Migrating ~/Developer to ~/Development on Mac"
+echo "🔄 Migrating ~/Development to ~/Development on Mac"
 
 # 1. Backup
 echo "📦 Creating backup..."
-tar -czf ~/Desktop/Developer-backup-$(date +%Y%m%d).tar.gz ~/Developer/
+tar -czf ~/Desktop/Developer-backup-$(date +%Y%m%d).tar.gz ~/Development/
 
 # 2. Rename
 echo "📁 Renaming directory..."
-mv ~/Developer ~/Development
+mv ~/Development ~/Development
 
 # 3. Update env.sh
 echo "🔧 Updating dotfiles/shell/env.sh..."
@@ -298,7 +298,7 @@ chmod +x migrate-to-development.sh
 ## Verifisering Checklist
 
 - [ ] `~/Development/` eksisterer
-- [ ] `~/Developer/` eksisterer IKKJE
+- [ ] `~/Development/` eksisterer IKKJE
 - [ ] `echo $PROJECTS_DIR` viser `~/Development`
 - [ ] Symlinks til secrets fungerer
 - [ ] Prosjekt kan buildast/køyrast
