@@ -1,0 +1,62 @@
+# EditorConfig for C/C++ Embedded Projects
+# https://editorconfig.org
+#
+# Usage: Place in project root (or parent directory)
+# Supported by most editors (VS Code, Vim, Emacs, IntelliJ, etc.)
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C/C++ files (Zephyr style: tabs)
+[*.{c,h,cpp,hpp}]
+indent_style = tab
+indent_size = 8
+tab_width = 8
+
+# CMake
+[CMakeLists.txt]
+indent_style = space
+indent_size = 4
+
+[*.cmake]
+indent_style = space
+indent_size = 4
+
+# Python (build scripts)
+[*.py]
+indent_style = space
+indent_size = 4
+
+# YAML (CI configs, west manifests)
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# JSON (configs)
+[*.json]
+indent_style = space
+indent_size = 4
+
+# Markdown (docs)
+[*.md]
+trim_trailing_whitespace = false
+
+# Shell scripts
+[*.sh]
+indent_style = tab
+indent_size = 4
+
+# Kconfig
+[*.conf]
+indent_style = space
+indent_size = 4
+
+# Device Tree
+[*.{dts,dtsi,overlay}]
+indent_style = tab
+indent_size = 8
