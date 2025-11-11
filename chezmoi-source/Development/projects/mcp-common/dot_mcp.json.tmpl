@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "{{ .chezmoi.homeDir }}/Development/projects/mcp-common/packages/mcp-gmail",
+        "run",
+        "python",
+        "-m",
+        "mcp_gmail.server"
+      ],
+      "env": {
+        "MCP_GMAIL_CREDENTIALS_PATH": "{{ .chezmoi.homeDir }}/dotfiles/secrets/gmail/credentials.json",
+        "MCP_GMAIL_TOKEN_PATH": "{{ .chezmoi.homeDir }}/dotfiles/secrets/gmail/token.json"
+      }
+    },
+    "readwise": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "{{ .chezmoi.homeDir }}/Development/projects/mcp-common/packages/mcp-readwise",
+        "run",
+        "python",
+        "main.py"
+      ]
+    },
+    "tana": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "{{ .chezmoi.homeDir }}/Development/projects/mcp-common/packages/mcp-tana",
+        "run",
+        "python",
+        "main.py"
+      ]
+    }
+  }
+}
