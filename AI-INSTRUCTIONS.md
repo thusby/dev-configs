@@ -295,7 +295,6 @@ Does it need CROSS-PLATFORM TEMPLATING?
 morning
 ```
 **Shows:**
-- Harsh habits to log
 - Pending tasks (taskwarrior)
 - Overdue tasks warning
 - Ready tasks (top 5 by urgency)
@@ -306,8 +305,6 @@ morning
 evening
 ```
 **Does:**
-- Shows harsh habit completion
-- Shows consistency graphs
 - Taskwarrior summary (completed today)
 - Scans ~/Development for uncommitted changes
 - **Auto-commits task-data to git** ← Important!
@@ -426,7 +423,7 @@ git checkout --theirs task-data/taskchampion.sqlite3
 
 ### When User Says "It's Not Working"
 1. **Check which machine** (Mac or Linux)
-2. **Verify tools installed** (task --version, harsh --version)
+2. **Verify tools installed** (task --version)
 3. **Check symlinks** (ls -la ~/.taskrc, ls -la ~/.task)
 4. **Run dotdoctor** to verify setup
 5. **Check secrets decrypted** (ls -la ~/dotfiles/secrets/, chezmoi apply)
@@ -463,7 +460,7 @@ dotdoctor
 ```
 
 This automated health check verifies:
-- ✅ All required tools installed (chezmoi, pet, fzf, taskwarrior, harsh)
+- ✅ All required tools installed (chezmoi, pet, fzf, taskwarrior)
 - ✅ Config symlinks exist (.gitconfig, .profile, .taskrc, .task, etc.)
 - ✅ Secrets symlinks exist (Claude, Ansible, Conda, etc.)
 - ✅ Bootstrap automation enabled (systemd/launchd)
