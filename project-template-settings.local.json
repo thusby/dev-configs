@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      // ============================================================================
+      // PROJECT-SPECIFIC PERMISSIONS
+      // Only add permissions unique to THIS project
+      // Do NOT duplicate global or development-level permissions
+      // ============================================================================
+
+      // Project-specific build scripts
+      // Example: "Bash(./build.sh:*)",
+      // Example: "Bash(./scripts/deploy.sh:*)",
+
+      // Project-specific tools
+      // Example: "Bash(make:*)",
+      // Example: "Bash(ansible-playbook:*)",
+      // Example: "Bash(pdftotext:*)",
+
+      // Project-specific file access (if needed)
+      // Example: "Read(//opt/monitoring/**)",
+      // Example: "Read(//etc/service/**)",
+
+      // Project-specific web resources
+      // Example: "WebFetch(domain:api.example.com)",
+      // Example: "WebFetch(domain:docs.myservice.org)",
+
+      // Placeholder - remove this and add your project-specific permissions above
+      "Bash(echo PROJECT_PLACEHOLDER:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+
+  // Enable MCP servers for this project
+  "enableAllProjectMcpServers": false
+}

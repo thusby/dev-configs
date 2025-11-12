@@ -1,0 +1,82 @@
+{
+  "permissions": {
+    "allow": [
+      // ============================================================================
+      // GLOBAL SAFE PERMISSIONS
+      // These are read-only, non-destructive commands safe for all projects
+      // ============================================================================
+
+      // File reading and navigation (read-only)
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(pwd:*)",
+      "Bash(cd:*)",
+      "Bash(tree:*)",
+      "Bash(less:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+
+      // Search and filtering (read-only)
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(xargs:*)",
+
+      // Git read-only operations
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+
+      // File metadata (read-only)
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(readlink:*)",
+      "Bash(realpath:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+      "Bash(md5sum:*)",
+
+      // System info (read-only)
+      "Bash(date:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(free:*)",
+      "Bash(whoami:*)",
+      "Bash(hostname:*)",
+      "Bash(env:*)",
+      "Bash(which:*)",
+
+      // Process info (read-only)
+      "Bash(ps:*)",
+      "Bash(top:*)",
+      "Bash(htop:*)",
+      "Bash(pgrep:*)",
+
+      // Safe utilities
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(sleep:*)",
+      "Bash(timeout:*)",
+
+      // Documentation and web resources
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
