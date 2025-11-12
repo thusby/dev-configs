@@ -22,8 +22,8 @@ Before making changes, always ask: **Is this personal preference or team standar
 | **Personal productivity** | `~/dotfiles/` | Individual workflow tools | taskwarrior config, habits |
 | **Team code standards** | `~/Development/dev-configs/` | Shared across projects | Python/C formatting rules |
 | **Templated configs** | `chezmoi-source/` | Cross-platform with variables | Claude settings with OS detection |
-| **Secrets (active)** | `~/dotfiles/secrets/` | git-crypt encrypted | API keys, OAuth tokens |
-| **Secrets (future)** | `chezmoi-source/` | Age + YubiKey encrypted | Migration in progress |
+| **Secrets** | `chezmoi-source/dotfiles/secrets/` | Age + YubiKey encrypted | API keys, OAuth tokens |
+| **Secrets (local)** | `~/dotfiles/secrets/` | Decrypted by chezmoi | NOT in git (gitignored) |
 | **Project code** | `~/Development/projects/` | Actual development work | Django, Vue, embedded, etc. |
 
 ---
@@ -45,43 +45,51 @@ Before making changes, always ask: **Is this personal preference or team standar
 └───┬────┘   └─────┬─────┘  └──────┬──────┘
     │              │               │
     │              │               ├─→ Templates
-    │              │               ├─→ Secrets (Age)
+    │              │               ├─→ Secrets (Age+YubiKey)
     │              │               └─→ Applies to ~
     │              │
     │              └─→ Team standards
     │                  (python/, c-embedded/, etc)
     │
-    └─→ Personal config + secrets (git-crypt)
+    └─→ Personal config
         ├─→ shell/
         ├─→ taskwarrior/
         ├─→ task-data/ (synced via git)
-        └─→ secrets/ (git-crypt)
+        └─→ secrets/ (decrypted from chezmoi, NOT in git)
 ```
 
 **See also:** `ECOSYSTEM.md` for detailed architecture diagram.
 
 ---
 
-## 🔐 Secrets Management (Dual-Mode Status)
+## 🔐 Secrets Management (Age + YubiKey)
 
-**IMPORTANT:** Two systems are currently active!
+**All secrets are encrypted with Age + YubiKey via Chezmoi:**
 
-### Active System (Primary): git-crypt
-- **Location:** `~/dotfiles/secrets/`
-- **Encryption:** git-crypt + GPG
-- **Status:** ✅ **Currently in use** - This is the source of truth
-- **Unlock:** `cd ~/dotfiles && git-crypt unlock`
-- **Lock:** Automatic at shutdown via systemd/launchd
+### How It Works
+- **Encrypted source:** `~/.local/share/chezmoi/dotfiles/secrets/*.age`
+- **Encryption:** Age with YubiKey PIV (age-plugin-yubikey)
+- **YubiKey:** Serial 12765346, touch policy cached (15 seconds)
+- **Decryption:** `chezmoi apply` (requires YubiKey touch)
+- **Local secrets:** `~/dotfiles/secrets/` (decrypted, NOT in git)
 
-### Migration Target: Age + YubiKey (via Chezmoi)
-- **Location:** `chezmoi-source/dotfiles/secrets/*.age`
-- **Status:** 🔄 Partial migration
-- **DO NOT** assume Age is primary yet
+### Architecture
+```
+Chezmoi Source (encrypted)                    Local (decrypted)
+~/.local/share/chezmoi/                      ~/dotfiles/secrets/
+└── dotfiles/secrets/*.age                   ├── .env.readwise
+    ├── encrypted_dot_env.readwise.age  →    ├── .env.pet
+    ├── encrypted_dot_env.pet.age       →    ├── gmail/
+    ├── gmail/encrypted_*.age           →    ├── claude/
+    └── ...                                  └── ...
+                                                   ↓
+                                             Symlinked to projects
+```
 
 **When adding new secrets:**
-1. Add to `~/dotfiles/secrets/` (git-crypt) ← **Current method**
-2. Optionally mirror to chezmoi (Age) for future
-3. Do NOT remove git-crypt versions yet
+1. Add encrypted file to chezmoi source: `~/.local/share/chezmoi/dotfiles/secrets/`
+2. Run `chezmoi apply` to decrypt to `~/dotfiles/secrets/`
+3. Symlink from `~/dotfiles/secrets/` to projects (via setup-secrets-symlinks.sh)
 
 ---
 
@@ -177,19 +185,22 @@ git push
 
 ### Adding Secret
 ```bash
-# 1. Add to git-crypt protected area
-echo "API_KEY=secret" > ~/dotfiles/secrets/.env.newservice
+# 1. Encrypt and add to chezmoi source
+echo "API_KEY=secret" | age -r age1yubikey1q0... -o ~/.local/share/chezmoi/dotfiles/secrets/encrypted_dot_env.newservice.age
 
-# 2. Symlink to project (via script)
+# 2. Apply to decrypt locally
+chezmoi apply  # Touch YubiKey when prompted
+
+# 3. Symlink to project (via script)
 ln -s ~/dotfiles/secrets/.env.newservice ~/Development/projects/myproject/.env
 
-# 3. Add to setup-secrets-symlinks.sh
+# 4. Add to setup-secrets-symlinks.sh
 # Edit ~/dotfiles/scripts/setup-secrets-symlinks.sh
 
-# 4. Commit (git-crypt will encrypt)
-cd ~/dotfiles
-git add secrets/.env.newservice scripts/setup-secrets-symlinks.sh
-git commit -m "Add newservice secrets"
+# 5. Commit encrypted file to chezmoi repo
+cd ~/.local/share/chezmoi
+git add dotfiles/secrets/encrypted_dot_env.newservice.age
+git commit -m "Add newservice secrets (Age encrypted)"
 git push
 ```
 
@@ -215,13 +226,16 @@ git push
 ~/Development/dev-configs/python/pyproject-base.toml
 ```
 
-### ❌ DON'T: Assume Age encryption is active
+### ❌ DON'T: Edit secrets directly in ~/dotfiles/secrets/
 ```bash
 # WRONG:
-chezmoi apply  # Expecting secrets to unlock
+echo "API_KEY=new" > ~/dotfiles/secrets/.env.service
 
-# RIGHT (for now):
-cd ~/dotfiles && git-crypt unlock
+# RIGHT:
+# Edit encrypted file in chezmoi source, then apply
+cd ~/.local/share/chezmoi
+# Edit and re-encrypt, then:
+chezmoi apply
 ```
 
 ### ❌ DON'T: Manually edit task-data SQLite
@@ -233,15 +247,16 @@ sqlite3 ~/dotfiles/task-data/taskchampion.sqlite3
 task add "Use the CLI"
 ```
 
-### ❌ DON'T: Commit unencrypted secrets
+### ❌ DON'T: Commit secrets to dotfiles repo
 ```bash
 # WRONG:
-echo "API_KEY=secret" > ~/dotfiles/.env
-git add .env
+echo "API_KEY=secret" > ~/dotfiles/secrets/.env
+cd ~/dotfiles && git add secrets/  # This dir is gitignored!
 
 # RIGHT:
-echo "API_KEY=secret" > ~/dotfiles/secrets/.env.service
-git add secrets/.env.service  # git-crypt will encrypt
+# Encrypt with Age and add to chezmoi source
+echo "API_KEY=secret" | age -r age1yubikey... -o ~/.local/share/chezmoi/dotfiles/secrets/encrypted_dot_env.service.age
+cd ~/.local/share/chezmoi && git add dotfiles/secrets/encrypted_dot_env.service.age
 ```
 
 ---
@@ -250,7 +265,8 @@ git add secrets/.env.service  # git-crypt will encrypt
 
 ```
 Is it a SECRET?
-├─ YES → ~/dotfiles/secrets/ (git-crypt encrypted)
+├─ YES → ~/.local/share/chezmoi/dotfiles/secrets/*.age (Age encrypted)
+│        Then: chezmoi apply → ~/dotfiles/secrets/ (decrypted, gitignored)
 └─ NO  → Continue...
 
 Is it PERSONAL PREFERENCE?
@@ -356,13 +372,13 @@ source ~/.zshrc   # Mac
 # Or restart terminal
 ```
 
-### "git-crypt: secrets not decrypted"
+### "Secrets not decrypted"
 ```bash
-cd ~/dotfiles
-git-crypt unlock
+# Decrypt secrets with YubiKey
+chezmoi apply  # Touch YubiKey when prompted
 
-# If that fails, check GPG keys:
-gpg --list-keys
+# Or unlock session helper
+unlock-session
 ```
 
 ### "Taskwarrior format mismatch"
@@ -413,17 +429,18 @@ git checkout --theirs task-data/taskchampion.sqlite3
 2. **Verify tools installed** (task --version, harsh --version)
 3. **Check symlinks** (ls -la ~/.taskrc, ls -la ~/.task)
 4. **Run dotdoctor** to verify setup
-5. **Check secrets unlocked** (git-crypt status)
+5. **Check secrets decrypted** (ls -la ~/dotfiles/secrets/, chezmoi apply)
 
 ### When User Wants to Sync Something
 1. **Identify what** (configs, secrets, tasks, code)
 2. **Determine method:**
    - Configs: git (dotfiles or dev-configs)
    - Tasks: git (via evening function)
-   - Secrets: git-crypt (currently) or Age (future)
+   - Secrets: Age+YubiKey (chezmoi source repo)
    - Code: git (project-specific)
 3. **Verify both machines** have compatible versions
-4. **Test sync** by checking on other machine
+4. **Verify YubiKey available** for secrets decryption
+5. **Test sync** by checking on other machine
 
 ### When Making Changes
 1. **Read relevant docs first** (ECOSYSTEM.md, this file)

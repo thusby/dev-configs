@@ -29,7 +29,7 @@ Visuell oversikt over Terje Husby sitt development ecosystem.
         ▼                    ▼
 ┌───────────────┐   ┌─────────────────┐
 │   secrets/    │   │  dev-configs/   │
-│  (git-crypt)  │   │   (shared)      │
+│ (Age+YubiKey) │   │   (shared)      │
 │               │   │                 │
 │  API tokens   │   │  Team standards │
 │  OAuth creds  │   │  Linting rules  │
@@ -67,15 +67,21 @@ Visuell oversikt over Terje Husby sitt development ecosystem.
 │                    MAINTAINER WORKFLOW                       │
 └─────────────────────────────────────────────────────────────┘
 
-1. Lagre secret i dotfiles:
-   ~/dotfiles/secrets/.env.readwise
+1. Encrypt and store in chezmoi:
+   ~/.local/share/chezmoi/dotfiles/secrets/encrypted_dot_env.readwise.age
               │
-              │ git-crypt encrypt
+              │ Age + YubiKey encrypt
               │
               ▼
    Commit til git (kryptert)
 
-2. Link til prosjekt:
+2. Decrypt locally:
+   chezmoi apply (YubiKey touch)
+              │
+              ▼
+   ~/dotfiles/secrets/.env.readwise
+
+3. Link til prosjekt:
    ~/Development/projects/mcp-readwise/.env
               │
               │ symlink
@@ -209,7 +215,7 @@ PLATTFORM-DETEKSJON:
 │ - Shell configs                                             │
 │ - Git global settings                                       │
 │ - SSH keys                                                  │
-│ - Secrets (git-crypt)                                       │
+│ - Secrets (decrypted from chezmoi Age+YubiKey)             │
 └─────────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -258,8 +264,18 @@ PRIVATE (GitHub, ukryptert)
 └── chezmoi repo (repo structure)
 
 
-ENCRYPTED (git-crypt i chezmoi)
-└── dotfiles/secrets/     🔒 Kryptert
+ENCRYPTED (Age + YubiKey in chezmoi source)
+└── ~/.local/share/chezmoi/dotfiles/secrets/     🔒 Age encrypted
+    ├── encrypted_dot_env.*.age
+    ├── gmail/
+    │   ├── encrypted_credentials.json.age
+    │   └── encrypted_token.json.age
+    └── tana/encrypted_token.txt.age
+
+    ↓ chezmoi apply (YubiKey touch) ↓
+
+DECRYPTED (Local, gitignored)
+└── ~/dotfiles/secrets/     🔓 Decrypted locally
     ├── .env.*
     ├── gmail/
     │   ├── credentials.json
@@ -291,7 +307,8 @@ LOCAL ONLY (.gitignore)
 START: Eg har ei fil som skal lagres
     │
     ├─► Er det ein SECRET? (API key, password, token)
-    │   ├─► JA → dotfiles/secrets/ (git-crypt)
+    │   ├─► JA → ~/.local/share/chezmoi/dotfiles/secrets/*.age (Age+YubiKey)
+    │   │        Then: chezmoi apply → ~/dotfiles/secrets/ (decrypted)
     │   └─► NEI → fortsett
     │
     ├─► Er det PERSONLEG CONFIG? (shell alias, git global)
@@ -348,9 +365,8 @@ ln -s ~/dotfiles/secrets/.env.nytt .env
 
 **...synke til ny maskin:**
 ```bash
-chezmoi init https://github.com/thusby/dotfiles
-chezmoi apply
-cd ~/dotfiles && git-crypt unlock
+chezmoi init https://github.com/thusby/chezmoi-source
+chezmoi apply  # Touch YubiKey to decrypt secrets
 ```
 
 **...dokumentere ny teknologi:**
@@ -374,7 +390,7 @@ git commit -m "docs: add XYZ to tech stack"
 **3 sikkerheitslag:**
 1. Public (dev-configs, prosjekt-kode)
 2. Private (chezmoi repo-struktur)
-3. Encrypted (secrets via git-crypt)
+3. Encrypted (secrets via Age + YubiKey)
 
 **1 workflow:**
 chezmoi → dotfiles → dev-configs → projects → tech-stack.md

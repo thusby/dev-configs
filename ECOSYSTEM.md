@@ -77,7 +77,7 @@ chezmoi managed      # Vis alle handterte filer
 **Struktur:**
 ```
 dotfiles/
-├── secrets/                 # git-crypt kryptert
+├── secrets/                 # Dekryptert frå chezmoi (IKKJE i git)
 │   ├── .env.readwise
 │   ├── gmail/
 │   │   ├── credentials.json
@@ -92,8 +92,9 @@ dotfiles/
 ```
 
 **Sikkerheit:**
-- git-crypt for secrets-kryptering
-- Symlinks frå prosjekt til secrets/
+- Age + YubiKey kryptering via chezmoi
+- Encrypted source: `~/.local/share/chezmoi/dotfiles/secrets/*.age`
+- Symlinks frå prosjekt til decrypted secrets/
 - `.env.example` i prosjekt, faktiske `.env` i dotfiles
 
 **Bruk i prosjekt (maintainer):**
@@ -259,29 +260,32 @@ ln -s ../../dev-configs/c-embedded/.clang-format .clang-format
 
 | Type | Lokasjon | Kryptering | Tilgang |
 |------|----------|------------|---------|
-| API tokens | `~/dotfiles/secrets/` | git-crypt | Kun maintainer |
-| OAuth creds | `~/dotfiles/secrets/gmail/` | git-crypt | Kun maintainer |
+| API tokens | `~/.local/share/chezmoi/dotfiles/secrets/*.age` | Age+YubiKey | Kun maintainer |
+| OAuth creds | `~/.local/share/chezmoi/dotfiles/secrets/gmail/*.age` | Age+YubiKey | Kun maintainer |
 | .env templates | Prosjekt `/.env.example` | Ingen (public) | Alle |
 | Lokal .env | Prosjekt `/.env` | Ingen (gitignore) | Lokal |
 
-### git-crypt Workflow
+### Age + YubiKey Workflow
 
 ```bash
-# Sjekk status
-cd ~/dotfiles
-git-crypt status
+# Dekrypter secrets (krev YubiKey touch)
+chezmoi apply
 
-# Lås (krypter)
-git-crypt lock
-
-# Lås opp (dekrypter)
-git-crypt unlock
+# Eller bruk helper function
+unlock-session
 
 # Legg til nytt secret
-echo "SECRET=value" > secrets/.env.new-service
-git-crypt status  # Skal vise "encrypted"
-git add secrets/.env.new-service
-git commit -m "Add secrets for new-service"
+# 1. Krypter med Age
+echo "SECRET=value" | age -r age1yubikey1q0... -o ~/.local/share/chezmoi/dotfiles/secrets/encrypted_dot_env.new-service.age
+
+# 2. Dekrypter lokalt
+chezmoi apply
+
+# 3. Commit encrypted version
+cd ~/.local/share/chezmoi
+git add dotfiles/secrets/encrypted_dot_env.new-service.age
+git commit -m "Add secrets for new-service (Age encrypted)"
+git push
 ```
 
 ---
@@ -396,13 +400,19 @@ git push
 ### Legge til nytt secret
 
 ```bash
-cd ~/dotfiles/secrets/
-echo "API_KEY=xyz" > .env.new-service
-git-crypt status  # Verifiser kryptering
-git add .env.new-service
-git commit -m "Add secrets for new-service"
+# 1. Krypter med Age
+cd ~/.local/share/chezmoi
+echo "API_KEY=xyz" | age -r age1yubikey1q0... -o dotfiles/secrets/encrypted_dot_env.new-service.age
 
-# Symlink frå prosjekt
+# 2. Commit encrypted version
+git add dotfiles/secrets/encrypted_dot_env.new-service.age
+git commit -m "Add secrets for new-service (Age encrypted)"
+git push
+
+# 3. Dekrypter lokalt
+chezmoi apply  # Touch YubiKey
+
+# 4. Symlink frå prosjekt
 cd ~/Development/projects/new-service/
 ln -s ~/dotfiles/secrets/.env.new-service .env
 ```
@@ -411,12 +421,10 @@ ln -s ~/dotfiles/secrets/.env.new-service .env
 
 ```bash
 # På ny maskin
-chezmoi init https://github.com/thusby/dotfiles
-chezmoi apply
+chezmoi init https://github.com/thusby/chezmoi-source
+chezmoi apply  # Touch YubiKey for secrets
 
-# Lås opp secrets
-cd ~/dotfiles
-git-crypt unlock
+# Secrets blir automatisk dekryptert til ~/dotfiles/secrets/
 ```
 
 ---
@@ -425,8 +433,9 @@ git-crypt unlock
 
 | Filtype | Eksempel | Lokasjon | Synkes av |
 |---------|----------|----------|-----------|
-| Personleg config | `.bashrc`, `.gitconfig` | `~/dotfiles/` | chezmoi |
-| Secrets | `credentials.json`, `.env` | `~/dotfiles/secrets/` | chezmoi + git-crypt |
+| Personleg config | `.bashrc`, `.gitconfig` | `~/dotfiles/` | git |
+| Secrets (encrypted) | `encrypted_*.age` | `~/.local/share/chezmoi/dotfiles/secrets/` | git (chezmoi) |
+| Secrets (decrypted) | `.env`, `credentials.json` | `~/dotfiles/secrets/` | chezmoi apply |
 | Team standards | `pyproject-base.toml` | `dev-configs/` | git |
 | Prosjekt-kode | `main.py`, `package.json` | `projects/X/` | git |
 | Prosjekt templates | `.env.example` | `projects/X/` | git |
@@ -437,12 +446,12 @@ git-crypt unlock
 
 ## 🎓 Best Practices
 
-1. ✅ **Secrets i dotfiles** - Aldri i prosjekt-repos
-2. ✅ **Standards i dev-configs** - Delt på tvers av prosjekt
-3. ✅ **Templates i prosjekt** - `.env.example` for andre
-4. ✅ **Dokumentasjon i tech-stack.md** - Samla oversikt
-5. ✅ **chezmoi for synk** - Personleg config på tvers av maskiner
-6. ✅ **git-crypt for secrets** - Kryptert i repo
+1. ✅ **Age + YubiKey for secrets** - Hardware-backed encryption
+2. ✅ **Secrets encrypted in chezmoi** - `.age` files in git
+3. ✅ **Standards i dev-configs** - Delt på tvers av prosjekt
+4. ✅ **Templates i prosjekt** - `.env.example` for andre
+5. ✅ **Dokumentasjon i tech-stack.md** - Samla oversikt
+6. ✅ **chezmoi for synk** - Personleg config på tvers av maskiner
 7. ✅ **Symlinks for maintainer** - Effektiv secrets-handtering
 8. ✅ **Copy for contributors** - Enkel onboarding
 
