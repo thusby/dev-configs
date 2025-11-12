@@ -394,3 +394,22 @@ git commit -m "docs: add XYZ to tech stack"
 
 **1 workflow:**
 chezmoi → dotfiles → dev-configs → projects → tech-stack.md
+
+## Git History Cleanup (2025-11-12)
+
+**Dotfiles repository history was reset to remove old git-crypt secrets.**
+
+### What Changed
+- Old history: 56 commits (with git-crypt encrypted secrets)
+- New history: Fresh start with 1 initial commit
+- No secrets in new history (secrets never were, and never will be in dotfiles repo)
+
+### Why
+- Clean separation: Secrets are now exclusively in `chezmoi-source` with Age encryption
+- Security hygiene: Even though git-crypt encrypted, better to not have secrets history
+- Simplification: Cleaner git history without legacy encryption artifacts
+
+### Impact
+- ⚠️ **Mac must reset dotfiles:** Run on Mac: `cd ~/dotfiles && git fetch --all && git reset --hard origin/main`
+- ✅ Secrets unchanged: All secrets still in `chezmoi-source` (Age encrypted)
+- ✅ Functionality unchanged: All dotfiles features work as before
