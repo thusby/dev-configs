@@ -45,6 +45,8 @@ detect_project_type() {
         echo "python"
     elif echo "$text" | grep -qE 'node|javascript|typescript|vue|react|npm'; then
         echo "node"
+    elif echo "$text" | grep -qE '\bgo\b|golang'; then
+        echo "go"
     elif echo "$text" | grep -qE '\bc\b|embedded|stm32|zephyr|arduino'; then
         echo "c"
     elif echo "$text" | grep -qE 'rust|cargo'; then

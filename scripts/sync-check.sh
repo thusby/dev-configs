@@ -28,14 +28,14 @@ check_dotfiles() {
         if [ -n "$(git status --porcelain)" ]; then
             status="uncommitted"
             details=$(git status --short | head -5)
-            ((issues_found++))
+            issues_found=$((issues_found + 1))
         fi
 
         # Check if behind origin
         git fetch origin main --quiet 2>/dev/null || true
         if git status | grep -q 'behind'; then
             status="behind"
-            ((issues_found++))
+            issues_found=$((issues_found + 1))
         fi
 
         # Check if ahead
@@ -45,7 +45,7 @@ check_dotfiles() {
     else
         status="error"
         details="Not a git repository"
-        ((issues_found++))
+        issues_found=$((issues_found + 1))
     fi
 
     results[dotfiles_status]="$status"
@@ -63,18 +63,18 @@ check_dev_configs() {
         if [ -n "$(git status --porcelain)" ]; then
             status="uncommitted"
             details=$(git status --short | head -5)
-            ((issues_found++))
+            issues_found=$((issues_found + 1))
         fi
 
         git fetch origin main --quiet 2>/dev/null || true
         if git status | grep -q 'behind'; then
             status="behind"
-            ((issues_found++))
+            issues_found=$((issues_found + 1))
         fi
     else
         status="error"
         details="Not found"
-        ((issues_found++))
+        issues_found=$((issues_found + 1))
     fi
 
     results[dev_configs_status]="$status"
@@ -93,11 +93,11 @@ check_chezmoi() {
         if [ -n "$chezmoi_status" ]; then
             status="unapplied"
             details=$(echo "$chezmoi_status" | head -3)
-            ((issues_found++))
+            issues_found=$((issues_found + 1))
         fi
     else
         status="not_installed"
-        ((issues_found++))
+        issues_found=$((issues_found + 1))
     fi
 
     results[chezmoi_status]="$status"
@@ -114,11 +114,11 @@ check_secrets() {
 
         if [ "$count" -eq 0 ]; then
             status="empty"
-            ((issues_found++))
+            issues_found=$((issues_found + 1))
         fi
     else
         status="missing"
-        ((issues_found++))
+        issues_found=$((issues_found + 1))
     fi
 
     results[secrets_status]="$status"

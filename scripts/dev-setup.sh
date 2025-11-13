@@ -44,7 +44,7 @@ steps_total=7
 steps_done=0
 
 report_progress() {
-    ((steps_done++))
+    steps_done=$((steps_done + 1))
     echo "{\"step\": $steps_done, \"total\": $steps_total, \"message\": \"$1\"}" >&2
 }
 
@@ -61,6 +61,10 @@ if [ -f "$HOME/Development/dev-configs/setup.sh" ]; then
             ;;
         node)
             "$HOME/Development/dev-configs/setup.sh" node . 2>/dev/null || true
+            ;;
+        go)
+            # Go projects: basic structure (no specific setup script yet)
+            mkdir -p cmd pkg internal
             ;;
         c)
             "$HOME/Development/dev-configs/setup.sh" c-embedded . 2>/dev/null || true
