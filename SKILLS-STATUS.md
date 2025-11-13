@@ -56,18 +56,22 @@
 
 ---
 
-### ⬜ Fase 3: Core Skills (IN PROGRESS)
-**Est. Duration:** 2-3 timer
+### ✅ Fase 3: Core Skills (COMPLETED)
+**Duration:** ~2 timer
+**Date:** 2025-11-13
 
-**To Implement:**
-- [ ] `sync-orchestrator` skill (evening trigger)
-- [ ] `dev-setup` skill (autonomous project setup)
-- [ ] Testing: Full workflow (morning → task add → setup → evening)
+**Completed:**
+- [x] `sync-orchestrator` skill (evening trigger)
+- [x] `dev-setup` skill (autonomous project setup)
+- [x] All core scripts implemented
 
-**Next Steps:**
-1. Implement `sync-orchestrator` for evening auto-commit/push
-2. Implement `dev-setup` for autonomous project initialization
-3. Test complete workflow end-to-end
+**Scripts:**
+- `evening-sync.sh` (145 lines) - Multi-repo status check with JSON output
+- `dev-setup.sh` (150 lines) - Autonomous project initialization
+- `task-analyze.sh` (100 lines) - Task analysis and project detection
+
+**Remaining:**
+- [ ] End-to-end testing: Full workflow (morning → task add → setup → evening)
 
 ---
 
@@ -90,7 +94,7 @@
 | **sync-check** | 52 | sync-check.sh (150) | ✅ Live | Morning sync verification |
 | **task-analyzer** | 50 | task-analyze.sh (100) | ✅ Live | Detect setup tasks |
 | **dev-setup** | 63 | dev-setup.sh (150) | ✅ Live | Autonomous project setup |
-| **sync-orchestrator** | 35 | evening-sync.sh (TODO) | ⬜ Planned | Evening sync workflow |
+| **sync-orchestrator** | 35 | evening-sync.sh (145) | ✅ Live | Evening sync workflow |
 | **secrets-mgmt** | - | secrets-mgmt.sh (TODO) | ⬜ Future | Age + YubiKey |
 | **docs-navigator** | - | - | ⬜ Future | Find relevant docs |
 
@@ -185,23 +189,21 @@ USER WORKFLOWS
 
 ## 🚀 Next Session Plan
 
-1. **Implement sync-orchestrator skill** (45 min)
-   - Evening auto-commit for dotfiles/dev-configs
-   - Push all repos
-   - Secrets re-encrypt detection
-
-2. **Implement dev-setup skill** (1 hour)
-   - Project name extraction
-   - Directory creation
-   - dev-configs/setup.sh execution
-   - Claude settings setup
-   - Git init
-   - Task marking (started)
-
-3. **End-to-end testing** (30 min)
-   - Full workflow: morning → task add → setup → evening
-   - Verify all signals and cleanups
+1. **End-to-end testing** (45 min)
+   - Test morning signal → sync-check skill
+   - Test task add "Setup..." → task-analyzer → dev-setup workflow
+   - Test evening signal → sync-orchestrator skill
+   - Verify all signal cleanups
    - Cross-machine sync test (Mac)
+
+2. **Polish and Documentation** (30 min)
+   - Update AI-INSTRUCTIONS.md with skills overview
+   - Consolidate documentation
+   - Error handling improvements in scripts
+
+3. **Optional Enhancements** (future)
+   - secrets-mgmt skill for Age + YubiKey workflow
+   - docs-navigator skill for documentation lookup
 
 ---
 
