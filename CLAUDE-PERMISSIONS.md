@@ -45,12 +45,26 @@
 - Kan vere destruktiv, men kontrollert
 - Gjeld på tvers av prosjekt
 
-**Døme:**
+**VIKTIG:** JSON-filer støttar ikkje kommentarar! Bruk `development-template-settings.local.json` som base.
+
+**Inkludert (sjå template for full liste):**
 ```json
-"Bash(git commit:*)",
-"Bash(docker compose:*)",
-"Bash(sudo systemctl:*)",
-"Bash(npm:*)"
+Git write: git add, commit, push, pull, merge, rebase, checkout, reset, stash, tag
+GitHub CLI: gh (alle subkommandoar)
+File ops: mkdir, touch, cp, mv, ln, chmod, tar, zip, unzip
+Network: curl, wget, ssh, scp, rsync
+Process: kill, killall, pkill
+System: systemctl, journalctl, apt
+Docker: docker, docker compose
+Python: python, pip, uv, pytest
+Node: node, npm, npx
+Rust: cargo, rustc
+Secrets: chezmoi, age, age-plugin-yubikey, gpg, ykman
+Tasks: task, harsh
+Claude: claude mcp
+Web: code.claude.com, gofastmcp.com
+
+Deny: sudo rm, rm -rf /, dd
 ```
 
 ### Project-Specific (projects/X/.claude/settings.local.json)

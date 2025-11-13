@@ -1,13 +1,6 @@
 {
   "permissions": {
     "allow": [
-      // ============================================================================
-      // DEVELOPMENT SYSTEM PERMISSIONS
-      // These are for system setup, infrastructure, and development tooling
-      // Applied to all projects under ~/Development
-      // ============================================================================
-
-      // Git write operations
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
@@ -18,81 +11,52 @@
       "Bash(git reset:*)",
       "Bash(git stash:*)",
       "Bash(git tag:*)",
-
-      // GitHub CLI
       "Bash(gh:*)",
-
-      // File operations (controlled)
       "Bash(mkdir:*)",
       "Bash(touch:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(ln:*)",
       "Bash(chmod:*)",
-
-      // Archive operations
       "Bash(tar:*)",
       "Bash(zip:*)",
       "Bash(unzip:*)",
-
-      // Network tools
       "Bash(curl:*)",
       "Bash(wget:*)",
       "Bash(ssh:*)",
       "Bash(scp:*)",
       "Bash(rsync:*)",
-
-      // Process management
       "Bash(kill:*)",
       "Bash(killall:*)",
       "Bash(pkill:*)",
-
-      // System administration
       "Bash(systemctl:*)",
       "Bash(sudo systemctl:*)",
       "Bash(journalctl:*)",
       "Bash(sudo apt:*)",
-
-      // Docker and containers
       "Bash(docker:*)",
       "Bash(docker compose:*)",
-
-      // Python development
       "Bash(python:*)",
       "Bash(python3:*)",
       "Bash(pip:*)",
       "Bash(uv:*)",
       "Bash(pytest:*)",
-
-      // Node.js development
       "Bash(node:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
-
-      // Rust development
       "Bash(rustc:*)",
       "Bash(cargo:*)",
-
-      // Dotfiles and secrets management
       "Bash(chezmoi:*)",
       "Bash(age:*)",
       "Bash(age-plugin-yubikey:*)",
       "Bash(gpg:*)",
       "Bash(ykman:*)",
-
-      // Task management
       "Bash(task:*)",
       "Bash(harsh:*)",
-
-      // Claude tooling
       "Bash(claude mcp:*)",
-
-      // Documentation resources
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:gofastmcp.com)"
     ],
     "deny": [
-      // Explicitly deny dangerous operations
       "Bash(sudo rm:*)",
       "Bash(rm -rf /:*)",
       "Bash(dd:*)"
