@@ -127,6 +127,42 @@ When updating configs:
 
 ---
 
+## Claude Code Skills Integration
+
+This repository includes autonomous skills for Claude Code that streamline development workflows:
+
+### Quick Start: New Project
+
+```bash
+# Create and setup a new project automatically
+new-project api-gateway go
+new-project mcp-slack python
+new-project iot-sensor c
+```
+
+**What happens:**
+1. Signal created: `~/.cache/claude-events/project-setup-requested.json`
+2. Claude Code `project-setup` skill activates
+3. Project directory created with:
+   - Language-specific structure (Cargo.toml for Rust, go.mod for Go, etc.)
+   - Claude settings from templates
+   - Git initialization
+   - README template
+
+### Daily Workflows
+
+**Morning:** `morning` - Sync verification
+- Checks dotfiles, dev-configs, secrets status
+- Reports uncommitted/unpushed changes
+
+**Evening:** `evening` - Multi-repo sync
+- Shows all repos with uncommitted changes
+- Auto-commits task data
+
+See [SKILLS-STATUS.md](./SKILLS-STATUS.md) for full documentation.
+
+---
+
 ## Projects Using These Configs
 
 - **mcp-common** - Python/FastMCP monorepo
