@@ -83,16 +83,18 @@
 
 ---
 
-## 📊 Skills Inventory
+## 📊 Skills Inventory (Script-Based Architecture)
 
-| Skill | Status | Trigger | Purpose |
-|-------|--------|---------|---------|
-| **sync-check** | ✅ Live | morning() | Verify repos/secrets sync |
-| **task-analyzer** | ✅ Live | on-add hook, morning() | Detect setup tasks, offer help |
-| **sync-orchestrator** | ⬜ Planned | evening() | Auto-commit/push workflow |
-| **dev-setup** | ⬜ Planned | task-analyzer | Autonomous project setup |
-| **secrets-mgmt** | ⬜ Future | evening(), manual | Age + YubiKey workflow |
-| **docs-navigator** | ⬜ Future | user questions | Find relevant docs |
+| Skill | Lines | Script | Status | Purpose |
+|-------|-------|--------|--------|---------|
+| **sync-check** | 52 | sync-check.sh (150) | ✅ Live | Morning sync verification |
+| **task-analyzer** | 50 | task-analyze.sh (100) | ✅ Live | Detect setup tasks |
+| **dev-setup** | 63 | dev-setup.sh (150) | ✅ Live | Autonomous project setup |
+| **sync-orchestrator** | 35 | evening-sync.sh (TODO) | ⬜ Planned | Evening sync workflow |
+| **secrets-mgmt** | - | secrets-mgmt.sh (TODO) | ⬜ Future | Age + YubiKey |
+| **docs-navigator** | - | - | ⬜ Future | Find relevant docs |
+
+**Context Reduction:** ~85% (from 1000+ lines to ~200 lines in SKILL.md files)
 
 ---
 
@@ -150,6 +152,16 @@ USER WORKFLOWS
 ### Signal Cleanup
 **Pattern:** Each skill deletes its own signal file after processing
 **Benefit:** Prevents double-processing, clean state
+
+### Script-Based Architecture (MAJOR)
+**Problem:** SKILL.md files were 200-400 lines each (~10-15% context per skill)
+**Solution:** Progressive disclosure - scripts + minimal skills
+**Result:**
+- SKILL.md: 20-50 lines (trigger + what script to call)
+- Scripts: Actual logic in bash (testable, reusable)
+- Context: ~85% reduction (from 1000+ lines to ~200 lines)
+**Inspired by:** IndyDevDan YouTube video on MCP context optimization
+**Commit:** 6272205
 
 ---
 
