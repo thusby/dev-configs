@@ -152,12 +152,13 @@ new-project iot-sensor c
 ### Daily Workflows
 
 **Morning:** `morning` - Sync verification
-- Checks dotfiles, dev-configs, secrets status
-- Reports uncommitted/unpushed changes
+- Shows dotfiles uncommitted changes
+- Triggers `sync-check` skill for autonomous verification
 
 **Evening:** `evening` - Multi-repo sync
-- Shows all repos with uncommitted changes
-- Auto-commits task data
+- Multi-repo status check (dotfiles, dev-configs)
+- Shows uncommitted changes across repositories
+- Triggers `sync-orchestrator` skill for autonomous workflow
 
 See [SKILLS-STATUS.md](./SKILLS-STATUS.md) for full documentation.
 
