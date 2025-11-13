@@ -19,11 +19,20 @@ else
     JSON=$(cat)
 fi
 
-# Extract params
-PROJECT_NAME=$(echo "$JSON" | jq -r '.analysis.project_name')
-PROJECT_TYPE=$(echo "$JSON" | jq -r '.analysis.project_type')
-PROJECT_PATH=$(echo "$JSON" | jq -r '.analysis.project_path')
-TASK_UUID=$(echo "$JSON" | jq -r '.task.uuid')
+# Extract params (support both formats: direct project and analysis)
+if echo "$JSON" | jq -e '.project' > /dev/null 2>&1; then
+    # Direct format from new-project command
+    PROJECT_NAME=$(echo "$JSON" | jq -r '.project.name')
+    PROJECT_TYPE=$(echo "$JSON" | jq -r '.project.type')
+    PROJECT_PATH=$(echo "$JSON" | jq -r '.project.path')
+    TASK_UUID=""
+else
+    # Analysis format from task-analyzer
+    PROJECT_NAME=$(echo "$JSON" | jq -r '.analysis.project_name')
+    PROJECT_TYPE=$(echo "$JSON" | jq -r '.analysis.project_type')
+    PROJECT_PATH=$(echo "$JSON" | jq -r '.analysis.project_path')
+    TASK_UUID=$(echo "$JSON" | jq -r '.task.uuid')
+fi
 
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Development}/projects"
 
@@ -65,6 +74,12 @@ if [ -f "$HOME/Development/dev-configs/setup.sh" ]; then
         go)
             # Go projects: basic structure (no specific setup script yet)
             mkdir -p cmd pkg internal
+            ;;
+        rust)
+            # Rust projects: cargo init
+            if command -v cargo &> /dev/null; then
+                cargo init --name "$PROJECT_NAME" . 2>/dev/null || true
+            fi
             ;;
         c)
             "$HOME/Development/dev-configs/setup.sh" c-embedded . 2>/dev/null || true
