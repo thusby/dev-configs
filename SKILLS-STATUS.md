@@ -265,9 +265,10 @@ USER WORKFLOWS
 ## 📚 Documentation References
 
 - [AUTOMATION-ANALYSIS.md](./AUTOMATION-ANALYSIS.md) - Initial analysis
-- [SKILL-INTEGRATION-PLAN.md](./SKILL-INTEGRATION-PLAN.md) - Integration architecture
 - [CLAUDE-PERMISSIONS.md](./CLAUDE-PERMISSIONS.md) - Permissions hierarchy
+- [MODEL-STRATEGY.md](./MODEL-STRATEGY.md) - Why Haiku for critical skills
 - [AI-INSTRUCTIONS.md](./AI-INSTRUCTIONS.md) - AI assistant guidelines
+- [archive/SKILL-INTEGRATION-PLAN.md](./archive/SKILL-INTEGRATION-PLAN.md) - Original taskwarrior-based plan
 
 ---
 
