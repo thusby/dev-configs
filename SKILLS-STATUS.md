@@ -70,8 +70,17 @@
 - `dev-setup.sh` (150 lines) - Autonomous project initialization
 - `task-analyze.sh` (100 lines) - Task analysis and project detection
 
-**Remaining:**
-- [ ] End-to-end testing: Full workflow (morning → task add → setup → evening)
+**Testing:**
+- [x] End-to-end testing: Full workflow verified
+  - ✅ morning → sync-check (detects uncommitted/unpushed)
+  - ✅ task add "Setup Go project" → task-analyzer → dev-setup (creates project)
+  - ✅ evening → sync-orchestrator (multi-repo status)
+  - ✅ All signal cleanups working
+
+**Bugs Fixed During Testing:**
+- `((i++))` arithmetic expansion with `set -e` (returns exit 1 when i=0)
+- Fixed in: sync-check.sh, evening-sync.sh, dev-setup.sh
+- Added Go/golang project detection
 
 ---
 
@@ -140,6 +149,28 @@ USER WORKFLOWS
 ✅ `task-analyzer` detects setup keyword
 ✅ Hook executable on both Linux/Mac (synced via dotfiles)
 
+### Fase 3 Tests (End-to-End)
+✅ **morning → sync-check workflow**
+  - Signal file created: morning-triggered.json
+  - sync-check.sh detected 3 issues (dotfiles, dev-configs, chezmoi)
+  - Signal cleanup verified
+
+✅ **task add → task-analyzer → dev-setup workflow**
+  - Created task: "Setup new Go project: api-gateway"
+  - on-add hook triggered signal file
+  - task-analyze.sh extracted: name=api-gateway, type=go
+  - dev-setup.sh created complete project structure
+    - Go dirs (cmd, pkg, internal)
+    - Git initialized with first commit
+    - Claude settings configured
+    - README template created
+
+✅ **evening → sync-orchestrator workflow**
+  - Signal file created with repo context
+  - evening-sync.sh detected 2 issues
+  - Multi-repo status working (dotfiles, dev-configs)
+  - Signal cleanup verified
+
 ---
 
 ## 🎓 Lessons Learned
@@ -166,6 +197,13 @@ USER WORKFLOWS
 - Context: ~85% reduction (from 1000+ lines to ~200 lines)
 **Inspired by:** IndyDevDan YouTube video on MCP context optimization
 **Commit:** 6272205
+
+### Bash Arithmetic with set -e
+**Problem:** `((i++))` returns exit code 1 when i=0, causing scripts with `set -e` to exit
+**Discovery:** Found during end-to-end testing - all 3 scripts failed silently
+**Solution:** Replace `((i++))` with `i=$((i + 1))` (always returns 0)
+**Impact:** Critical bug affecting all scripts with issue counting
+**Commit:** 77c5d54
 
 ---
 
