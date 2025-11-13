@@ -201,17 +201,24 @@ USER WORKFLOWS
 **Impact:** Critical bug affecting all scripts with issue counting
 **Commit:** 77c5d54
 
-### Taskwarrior Dependency Removal
-**Problem:** Using Taskwarrior for project setup felt like overkill
-- Required: `task add "Setup new Go project: api-gateway"` (verbose)
-- Hooks only used for triggering setup (not for actual task tracking)
-- Git history provides enough tracking
-**Solution:** Direct `new-project` shell function
-- Usage: `new-project api-gateway go` (2 words)
-- Creates signal directly: `project-setup-requested.json`
-- Simpler workflow, less dependencies
-**Impact:** Removed unnecessary task tracking layer, faster workflow
-**Commits:** ee4efb0 (dotfiles), 4bfa534 (dev-configs)
+### Taskwarrior Complete Removal
+**Problem:** Taskwarrior integration added complexity without value
+- Hooks: Only used for project setup (now direct `new-project`)
+- morning/evening: Task counts were informational noise
+- Auto-commit: task-data/ syncing not needed
+- Git history provides sufficient project tracking
+**Solution:** Removed entirely from workflows
+- Replaced with: `new-project api-gateway go` (direct)
+- morning(): Simplified to dotfiles status check
+- evening(): Shows repos/dotfiles status only
+- Removed: hooks, task-analyzer skill, task-data/ syncing
+**Impact:** Cleaner workflows, less mental overhead, 3 active skills (down from 5)
+**Commits:**
+- ee4efb0: Added new-project function
+- 094da3d: Removed hooks
+- 1a3458c: Removed from morning/evening, deleted task-data/
+- 275d529: Removed task-analyze.sh script
+- 4bfa534: Dual format support in dev-setup.sh
 
 ---
 
@@ -227,9 +234,11 @@ USER WORKFLOWS
 
 ### Implementation Speed
 - Fase 1 (Foundation): 1 hour
-- Fase 2 (Taskwarrior): 30 min
-- **Total so far:** 1.5 hours
-- **Remaining:** ~3 hours (Fase 3 + 4)
+- Fase 2 (Direct Project Setup): 1 hour
+- Fase 3 (Core Skills + Testing): 2 hours
+- **Total:** 4 hours
+- **Cleanup/Refactoring:** 1 hour (Taskwarrior removal)
+- **Grand Total:** 5 hours (from concept to production)
 
 ---
 
