@@ -104,6 +104,7 @@
 | **task-analyzer** | 50 | task-analyze.sh (100) | ✅ Live | Detect setup tasks |
 | **dev-setup** | 63 | dev-setup.sh (150) | ✅ Live | Autonomous project setup |
 | **sync-orchestrator** | 35 | evening-sync.sh (145) | ✅ Live | Evening sync workflow |
+| **project-setup** | 50 | dev-setup.sh (150) | ✅ Live | Direct new-project workflow |
 | **secrets-mgmt** | - | secrets-mgmt.sh (TODO) | ⬜ Future | Age + YubiKey |
 | **docs-navigator** | - | - | ⬜ Future | Find relevant docs |
 
@@ -204,6 +205,18 @@ USER WORKFLOWS
 **Solution:** Replace `((i++))` with `i=$((i + 1))` (always returns 0)
 **Impact:** Critical bug affecting all scripts with issue counting
 **Commit:** 77c5d54
+
+### Taskwarrior Dependency Removal
+**Problem:** Using Taskwarrior for project setup felt like overkill
+- Required: `task add "Setup new Go project: api-gateway"` (verbose)
+- Hooks only used for triggering setup (not for actual task tracking)
+- Git history provides enough tracking
+**Solution:** Direct `new-project` shell function
+- Usage: `new-project api-gateway go` (2 words)
+- Creates signal directly: `project-setup-requested.json`
+- Simpler workflow, less dependencies
+**Impact:** Removed unnecessary task tracking layer, faster workflow
+**Commits:** ee4efb0 (dotfiles), 4bfa534 (dev-configs)
 
 ---
 
