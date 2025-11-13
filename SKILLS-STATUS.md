@@ -24,35 +24,34 @@
 
 ---
 
-### ✅ Fase 2: Taskwarrior Integration (COMPLETED)
-**Duration:** ~30 min
+### ✅ Fase 2: Direct Project Setup (COMPLETED)
+**Duration:** ~1 hour
 **Date:** 2025-11-13
 
-- [x] Taskwarrior hooks directory
-- [x] `on-add.sh` hook (setup task detection)
-- [x] `on-modify.sh` hook (completion detection)
-- [x] `task-analyzer` skill
-- [x] Testing: task add → signal file creation
+- [x] `new-project` shell function (replaces Taskwarrior)
+- [x] `project-setup` skill
+- [x] Dual format support in dev-setup.sh
+- [x] Testing: new-project → signal file → project creation
 
 **Files:**
-- `~/dotfiles/task-data/hooks/on-add.sh` - Setup detection hook
-- `~/dotfiles/task-data/hooks/on-modify.sh` - Completion detection hook
-- `~/.claude/skills/task-analyzer/SKILL.md` - Task analysis skill
+- `~/dotfiles/shell/functions.sh` - new-project command
+- `~/.claude/skills/project-setup/SKILL.md` - Project setup skill
+- `~/Development/dev-configs/scripts/dev-setup.sh` - Dual format support
 
 **Signal Format:**
 ```json
 {
-  "event": "task_added_setup",
-  "timestamp": "2025-11-13T09:47:40+01:00",
-  "task": {
-    "uuid": "1c628f7e...",
-    "description": "Setup new Python project: test-automation",
-    "tags": "dev"
+  "event": "project_setup_direct",
+  "timestamp": "2025-11-13T10:39:23+01:00",
+  "project": {
+    "name": "test-cli",
+    "type": "rust",
+    "path": "/home/user/Development/projects/test-cli"
   }
 }
 ```
 
-**Commit:** 67504ca (dotfiles)
+**Commits:** ee4efb0 (dotfiles), 4bfa534 (dev-configs)
 
 ---
 
@@ -67,13 +66,12 @@
 
 **Scripts:**
 - `evening-sync.sh` (145 lines) - Multi-repo status check with JSON output
-- `dev-setup.sh` (150 lines) - Autonomous project initialization
-- `task-analyze.sh` (100 lines) - Task analysis and project detection
+- `dev-setup.sh` (150 lines) - Autonomous project initialization (dual format support)
 
 **Testing:**
 - [x] End-to-end testing: Full workflow verified
   - ✅ morning → sync-check (detects uncommitted/unpushed)
-  - ✅ task add "Setup Go project" → task-analyzer → dev-setup (creates project)
+  - ✅ new-project test-cli rust → project-setup → dev-setup (creates project)
   - ✅ evening → sync-orchestrator (multi-repo status)
   - ✅ All signal cleanups working
 
@@ -101,10 +99,8 @@
 | Skill | Lines | Script | Status | Purpose |
 |-------|-------|--------|--------|---------|
 | **sync-check** | 52 | sync-check.sh (150) | ✅ Live | Morning sync verification |
-| **task-analyzer** | 50 | task-analyze.sh (100) | ✅ Live | Detect setup tasks |
-| **dev-setup** | 63 | dev-setup.sh (150) | ✅ Live | Autonomous project setup |
-| **sync-orchestrator** | 35 | evening-sync.sh (145) | ✅ Live | Evening sync workflow |
 | **project-setup** | 50 | dev-setup.sh (150) | ✅ Live | Direct new-project workflow |
+| **sync-orchestrator** | 35 | evening-sync.sh (145) | ✅ Live | Evening sync workflow |
 | **secrets-mgmt** | - | secrets-mgmt.sh (TODO) | ⬜ Future | Age + YubiKey |
 | **docs-navigator** | - | - | ⬜ Future | Find relevant docs |
 
@@ -118,7 +114,7 @@
 USER WORKFLOWS
     ↓
 ┌──────────────────┬─────────────────┬──────────────────┐
-│   morning()      │   task add      │   evening()      │
+│   morning()      │  new-project    │   evening()      │
 └────────┬─────────┴────────┬────────┴────────┬─────────┘
          │                  │                 │
          ▼                  ▼                 ▼
@@ -126,8 +122,8 @@ USER WORKFLOWS
          │                  │                 │
          ▼                  ▼                 ▼
     ┌─────────────┐  ┌──────────────┐  ┌──────────────┐
-    │ sync-check  │  │task-analyzer │  │sync-orch.    │
-    │ skill       │  │ skill        │  │(planned)     │
+    │ sync-check  │  │project-setup │  │sync-orch.    │
+    │ skill       │  │ skill        │  │skill         │
     └─────────────┘  └──────────────┘  └──────────────┘
          │                  │                 │
          ▼                  ▼                 ▼
@@ -145,10 +141,10 @@ USER WORKFLOWS
 ✅ `evening` → signal file with repo context
 
 ### Fase 2 Tests
-✅ `task add "Setup..."` → on-add hook triggers
-✅ Signal file created with task UUID and description
-✅ `task-analyzer` detects setup keyword
-✅ Hook executable on both Linux/Mac (synced via dotfiles)
+✅ `new-project api-gateway go` → signal created
+✅ Signal file: project-setup-requested.json
+✅ project-setup skill observes and triggers dev-setup.sh
+✅ Function available on both Linux/Mac (synced via dotfiles)
 
 ### Fase 3 Tests (End-to-End)
 ✅ **morning → sync-check workflow**
@@ -156,12 +152,11 @@ USER WORKFLOWS
   - sync-check.sh detected 3 issues (dotfiles, dev-configs, chezmoi)
   - Signal cleanup verified
 
-✅ **task add → task-analyzer → dev-setup workflow**
-  - Created task: "Setup new Go project: api-gateway"
-  - on-add hook triggered signal file
-  - task-analyze.sh extracted: name=api-gateway, type=go
+✅ **new-project → project-setup → dev-setup workflow**
+  - Command: `new-project test-cli rust`
+  - Signal file: project-setup-requested.json
   - dev-setup.sh created complete project structure
-    - Go dirs (cmd, pkg, internal)
+    - Rust: Cargo.toml, src/main.rs, .gitignore
     - Git initialized with first commit
     - Claude settings configured
     - README template created
