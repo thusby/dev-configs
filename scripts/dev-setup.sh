@@ -19,20 +19,10 @@ else
     JSON=$(cat)
 fi
 
-# Extract params (support both formats: direct project and analysis)
-if echo "$JSON" | jq -e '.project' > /dev/null 2>&1; then
-    # Direct format from new-project command
-    PROJECT_NAME=$(echo "$JSON" | jq -r '.project.name')
-    PROJECT_TYPE=$(echo "$JSON" | jq -r '.project.type')
-    PROJECT_PATH=$(echo "$JSON" | jq -r '.project.path')
-    TASK_UUID=""
-else
-    # Analysis format from task-analyzer
-    PROJECT_NAME=$(echo "$JSON" | jq -r '.analysis.project_name')
-    PROJECT_TYPE=$(echo "$JSON" | jq -r '.analysis.project_type')
-    PROJECT_PATH=$(echo "$JSON" | jq -r '.analysis.project_path')
-    TASK_UUID=$(echo "$JSON" | jq -r '.task.uuid')
-fi
+# Extract params (direct format from new-project command)
+PROJECT_NAME=$(echo "$JSON" | jq -r '.project.name')
+PROJECT_TYPE=$(echo "$JSON" | jq -r '.project.type')
+PROJECT_PATH=$(echo "$JSON" | jq -r '.project.path')
 
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Development}/projects"
 
@@ -142,12 +132,6 @@ git commit -m "Initial setup for $PROJECT_NAME
 Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null
 report_progress "Git initialized"
 
-# 7. Mark task as started
-if [ -n "$TASK_UUID" ] && command -v task &> /dev/null; then
-    task "$TASK_UUID" start 2>/dev/null || true
-fi
-report_progress "Task marked as started"
-
 # Success output
 cat <<EOF
 {
@@ -157,7 +141,6 @@ cat <<EOF
     "type": "$PROJECT_TYPE",
     "path": "$PROJECT_PATH"
   },
-  "steps_completed": $steps_total,
-  "task_uuid": "$TASK_UUID"
+  "steps_completed": $steps_total
 }
 EOF

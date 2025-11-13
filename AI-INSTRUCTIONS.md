@@ -19,7 +19,7 @@ Before making changes, always ask: **Is this personal preference or team standar
 | What | Where | Why | Example |
 |------|-------|-----|---------|
 | **Personal shell config** | `~/dotfiles/shell/` | User-specific preferences | aliases, functions, prompts |
-| **Personal productivity** | `~/dotfiles/` | Individual workflow tools | taskwarrior config, habits |
+| **Personal productivity** | `~/dotfiles/` | Individual workflow tools | shell functions, personal scripts |
 | **Team code standards** | `~/Development/dev-configs/` | Shared across projects | Python/C formatting rules |
 | **Templated configs** | `chezmoi-source/` | Cross-platform with variables | Claude settings with OS detection |
 | **Secrets** | `chezmoi-source/dotfiles/secrets/` | Age + YubiKey encrypted | API keys, OAuth tokens |
@@ -53,8 +53,7 @@ Before making changes, always ask: **Is this personal preference or team standar
     │
     └─→ Personal config
         ├─→ shell/
-        ├─→ taskwarrior/
-        ├─→ task-data/ (synced via git)
+        ├─→ .claude/skills/ (Claude Code skills)
         └─→ secrets/ (decrypted from chezmoi, NOT in git)
 ```
 
@@ -114,38 +113,39 @@ Chezmoi Source (encrypted)                    Local (decrypted)
 
 ---
 
-## 📋 Task Management (Taskwarrior)
+## 🤖 Claude Code Skills
 
-### Setup (as of 2025-11-12)
-- **Version:** 3.4.2 on both Mac and Linux
-- **Format:** SQLite (`taskchampion.sqlite3`)
-- **Data location:** `~/dotfiles/task-data/` (synced via git)
-- **Config:** `~/dotfiles/taskwarrior/taskrc`
+### Setup (as of 2025-11-13)
+- **Location:** `~/dotfiles/.claude/skills/` (synced via git)
+- **Symlink:** `~/.claude/skills` → `~/dotfiles/.claude/skills/`
+- **Active skills:** 3 (sync-check, project-setup, sync-orchestrator)
+- **Model:** All skills use Haiku for reliability
 
-### Tag-Based Organization
+### Event-Driven Architecture
+Skills are triggered by signal files in `~/.cache/claude-events/`:
+
 ```bash
-# Machine-specific tasks
-task add "Mac-only thing" +mac
-task add "Linux-only thing" +linux
+# Morning routine creates signal
+morning → ~/.cache/claude-events/morning-triggered.json
+  → sync-check skill activates
 
-# Shared tasks (no tag)
-task add "Works everywhere"
+# New project creates signal
+new-project api-gateway go → ~/.cache/claude-events/project-setup-requested.json
+  → project-setup skill activates
 
-# Context switching
-task context mac      # Show only Mac tasks
-task context linux    # Show only Linux tasks
-task context shared   # Show only untagged
-task context none     # Show all
+# Evening routine creates signal
+evening → ~/.cache/claude-events/evening-triggered.json
+  → sync-orchestrator skill activates
 ```
 
-### Auto-Commit Workflow
-1. User works with tasks: `task add`, `task done`
-2. User runs `evening` function (or manually)
-3. Script auto-commits `task-data/` to git
-4. Other machine pulls changes
-5. Tasks sync across machines
+### Skills Documentation
+See `~/Development/dev-configs/SKILLS-STATUS.md` for:
+- Implementation status
+- Event flow diagrams
+- Testing results
+- Lessons learned
 
-**DO NOT** manually sync task-data between machines outside of git.
+**See also:** `MODEL-STRATEGY.md` for rationale on using Haiku for critical operations.
 
 ---
 
@@ -238,15 +238,6 @@ cd ~/.local/share/chezmoi
 chezmoi apply
 ```
 
-### ❌ DON'T: Manually edit task-data SQLite
-```bash
-# WRONG:
-sqlite3 ~/dotfiles/task-data/taskchampion.sqlite3
-
-# RIGHT:
-task add "Use the CLI"
-```
-
 ### ❌ DON'T: Commit secrets to dotfiles repo
 ```bash
 # WRONG:
@@ -295,20 +286,34 @@ Does it need CROSS-PLATFORM TEMPLATING?
 morning
 ```
 **Shows:**
-- Pending tasks (taskwarrior)
-- Overdue tasks warning
-- Ready tasks (top 5 by urgency)
 - Dotfiles uncommitted changes
+- Tip about new-project command
+
+**Triggers:**
+- `sync-check` skill via signal file
+- Autonomous verification of sync status
+
+### New Project Setup
+```bash
+new-project api-gateway go
+new-project mcp-slack python
+```
+**Does:**
+- Creates signal file for Claude Code
+- `project-setup` skill activates automatically
+- Complete project structure created
 
 ### Evening Routine
 ```bash
 evening
 ```
 **Does:**
-- Taskwarrior summary (completed today)
-- Scans ~/Development for uncommitted changes
-- **Auto-commits task-data to git** ← Important!
-- Shows dotfiles status
+- Multi-repo status check (dotfiles, dev-configs)
+- Shows uncommitted changes across repositories
+
+**Triggers:**
+- `sync-orchestrator` skill via signal file
+- Autonomous multi-repo sync workflow
 
 ### Health Check
 ```bash
@@ -334,15 +339,17 @@ git pull
 source ~/.bashrc  # or ~/.zshrc on Mac
 ```
 
-### Task Sync (Automatic via evening)
+### Claude Code Skills Sync (Automatic)
 ```bash
 # On Machine A:
-task add "New task"
-evening  # Auto-commits task-data
+cd ~/dotfiles
+git add .claude/skills/
+git commit -m "Update skills"
+git push
 
 # On Machine B:
 cd ~/dotfiles && git pull
-task list  # Sees new task
+# Skills automatically available via symlink: ~/.claude/skills → ~/dotfiles/.claude/skills/
 ```
 
 ### Dev-Configs Sync (Manual)
@@ -378,24 +385,20 @@ chezmoi apply  # Touch YubiKey when prompted
 unlock-session
 ```
 
-### "Taskwarrior format mismatch"
-This happened when we had v2.6 (Linux) and v3.4 (Mac).
-**Solution:** Both machines now run v3.4.2 with SQLite format.
+### "Skills not activating"
+```bash
+# Check signal files exist
+ls -la ~/.cache/claude-events/
+
+# Check skills symlink
+ls -la ~/.claude/skills
+
+# Should point to: ~/dotfiles/.claude/skills/
+```
 
 ### "Chezmoi session locked"
 ```bash
 unlock-session  # Prompts for YubiKey PIN
-```
-
-### "Task data conflicts"
-If you get git merge conflicts in `taskchampion.sqlite3`:
-```bash
-# Accept one version:
-git checkout --ours task-data/taskchampion.sqlite3
-# or
-git checkout --theirs task-data/taskchampion.sqlite3
-
-# Then manually reconcile tasks
 ```
 
 ---
@@ -408,6 +411,8 @@ git checkout --theirs task-data/taskchampion.sqlite3
 - **CHEZMOI-SETUP.md** - Chezmoi-specific instructions
 - **MIGRATION.md** - Developer → Development path migration
 - **TECH-STACK.md** - Technologies and versions in use
+- **SKILLS-STATUS.md** - Claude Code skills implementation status
+- **MODEL-STRATEGY.md** - Why Haiku for critical operations
 
 ---
 
@@ -460,11 +465,12 @@ dotdoctor
 ```
 
 This automated health check verifies:
-- ✅ All required tools installed (chezmoi, pet, fzf, taskwarrior)
-- ✅ Config symlinks exist (.gitconfig, .profile, .taskrc, .task, etc.)
+- ✅ All required tools installed (chezmoi, pet, fzf)
+- ✅ Config symlinks exist (.gitconfig, .profile, etc.)
 - ✅ Secrets symlinks exist (Claude, Ansible, Conda, etc.)
 - ✅ Bootstrap automation enabled (systemd/launchd)
-- ✅ Shell functions available (morning, evening)
+- ✅ Shell functions available (morning, evening, new-project)
+- ✅ Claude Code skills symlink (→ ~/dotfiles/.claude/skills/)
 - ✅ Chezmoi session unlocked
 
 **When adding new tools:**
@@ -504,6 +510,6 @@ A well-integrated change should:
 
 ---
 
-**Last Updated:** 2025-11-12
+**Last Updated:** 2025-11-13
 **Maintained By:** Terje Husby (@thusby)
 **AI Assistants:** Please keep this document updated when making significant ecosystem changes.

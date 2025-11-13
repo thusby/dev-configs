@@ -242,23 +242,30 @@ USER WORKFLOWS
 
 ---
 
-## 🚀 Next Session Plan
+## 🚀 Future Enhancements
 
-1. **End-to-end testing** (45 min)
-   - Test morning signal → sync-check skill
-   - Test task add "Setup..." → task-analyzer → dev-setup workflow
-   - Test evening signal → sync-orchestrator skill
-   - Verify all signal cleanups
-   - Cross-machine sync test (Mac)
+### Potential Skills (Low Priority)
 
-2. **Polish and Documentation** (30 min)
-   - Update AI-INSTRUCTIONS.md with skills overview
-   - Consolidate documentation
-   - Error handling improvements in scripts
+1. **secrets-mgmt skill**
+   - Simplify Age + YubiKey workflow
+   - Auto-decrypt, edit, re-encrypt secrets
+   - Verify YubiKey availability
 
-3. **Optional Enhancements** (future)
-   - secrets-mgmt skill for Age + YubiKey workflow
-   - docs-navigator skill for documentation lookup
+2. **docs-navigator skill**
+   - Help find relevant documentation
+   - Context-aware suggestions
+   - Quick reference lookup
+
+3. **project-migrate skill**
+   - Update old projects to new standards
+   - Apply dev-configs templates
+   - Migrate to new Claude permissions
+
+### System Improvements
+
+- Cross-platform testing automation
+- Error handling improvements in scripts
+- Performance optimization for large repos
 
 ---
 
